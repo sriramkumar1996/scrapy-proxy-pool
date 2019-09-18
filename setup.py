@@ -14,14 +14,14 @@ def get_long_description():
 
 
 setup(
-    name='scrapy-proxy-pool',
+    name='sriram-proxy-pool',
     version=get_version(),
-    author='Neal Wong',
-    author_email='qwang16@olivetuniversity.edu',
+    author='Srriam Kumar',
+    author_email='srirambsk1996@gmail.com',
     license='MIT',
     long_description=get_long_description(),
-    description="Simple scrapy proxy pool",
-    url='https://github.com/hyan15/scrapy-proxy-pool',
+    description="SDT scrapy proxy pool",
+    url='https://github.com/sriramkumar1996/scrapy-proxy-pool',
     packages=find_packages(exclude=['tests']),
     install_requires=[
         'scrapy',
