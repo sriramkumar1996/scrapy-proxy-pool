@@ -8,7 +8,7 @@ Installation
 
 ::
 
-    pip install scrapy_proxy_pool
+    pip install sriram_proxy_pool
 
 Usage
 -----
