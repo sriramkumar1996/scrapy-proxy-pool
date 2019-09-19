@@ -81,7 +81,9 @@ class ProxyPoolMiddleware(object):
             raise NotConfigured()
 
         filters = dict()
-        filters['anonymous'] = s.getbool('PROXY_POOL_FILTER_ANONYMOUS', False)
+        anonymous = s.getbool('PROXY_POOL_FILTER_ANONYMOUS', False)
+        if anonymous:
+            filters['anonymous'] = anonymous
         filters['type'] = s.get('PROXY_POOL_FILTER_TYPES', ['http', 'https'])
         filters['code'] = s.get('PROXY_POOL_FILTER_CODE', 'us')
 
@@ -126,6 +128,7 @@ class ProxyPoolMiddleware(object):
                     logger.info('Proxies refreshed.')
                     self.refresh_blacklist()
 
+                print("No proxies available. Tring to download with host ip.")    
                 logger.info("Try to download with host ip.")
                 request.meta.pop('proxy_source', None)
                 request.meta.pop('proxy', None)
