@@ -65,9 +65,9 @@ class ProxyPoolMiddleware(object):
         self.collector = create_collector('proxy-pool', ['http', 'https'], refresh_interval, None, elite, external_url)
         self.collector.apply_filter(filters)
         if self.collector.get_proxies():
-            logger.info("Proxies: ", len(self.collector.get_proxies()))
+            logger.info("Proxies: " + str(len(self.collector.get_proxies())))
         else:
-            logger.info("Proxies: ", 0)
+            logger.info("Proxies: 0")
                 
         self.refresh_interval = refresh_interval
         self.logstats_interval = logstats_interval
