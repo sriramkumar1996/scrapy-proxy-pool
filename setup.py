@@ -11,12 +11,12 @@ def get_version():
 
 def get_long_description():
     readme = open('README.rst').read()
-
+    # return readme
 
 setup(
     name='sriram-proxy-pool',
     version=get_version(),
-    author='Srriam Kumar',
+    author='Sriram Kumar',
     author_email='srirambsk1996@gmail.com',
     license='MIT',
     long_description=get_long_description(),
@@ -25,7 +25,7 @@ setup(
     packages=find_packages(exclude=['tests']),
     install_requires=[
         'scrapy',
-        'proxyscrape'
+        'sriram-proxyscrape'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',

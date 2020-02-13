@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import absolute_import
 import logging
 
@@ -62,16 +61,21 @@ class ProxyPoolMiddleware(object):
       ``PROXY_POOL_PAGE_RETRY_TIMES`` alive proxies. Default: 5.
     """
     def __init__(self, filters, refresh_interval, logstats_interval, stop_if_no_proxies,
-                 max_proxies_to_try, force_refresh_if_no_proxies, try_with_host):
-        self.collector = create_collector('proxy-pool', ['http', 'https'], refresh_interval)
+                 max_proxies_to_try, force_refresh_if_no_proxies, try_with_host, elite, external_url):
+        self.collector = create_collector('proxy-pool', ['http', 'https'], refresh_interval, None, elite, external_url)
         self.collector.apply_filter(filters)
-
+        if self.collector.get_proxies():
+            logger.info("Proxies: ", len(self.collector.get_proxies()))
+        else:
+            logger.info("Proxies: ", 0)
+                
         self.refresh_interval = refresh_interval
         self.logstats_interval = logstats_interval
         self.stop_if_no_proxies = stop_if_no_proxies
         self.max_proxies_to_try = max_proxies_to_try
         self.force_refresh_if_no_proxies = force_refresh_if_no_proxies
         self.try_with_host = try_with_host
+        
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -84,8 +88,10 @@ class ProxyPoolMiddleware(object):
         anonymous = s.getbool('PROXY_POOL_FILTER_ANONYMOUS', False)
         if anonymous:
             filters['anonymous'] = anonymous
+        country_code = s.get('PROXY_POOL_FILTER_CODE', None)
+        if country_code:
+            filters['code'] = country_code
         filters['type'] = s.get('PROXY_POOL_FILTER_TYPES', ['http', 'https'])
-        filters['code'] = s.get('PROXY_POOL_FILTER_CODE', 'us')
 
         mw = cls(
             filters=filters,
@@ -94,7 +100,9 @@ class ProxyPoolMiddleware(object):
             stop_if_no_proxies=s.getbool('PROXY_POOL_CLOSE_SPIDER', False),
             max_proxies_to_try=s.getint('PROXY_POOL_PAGE_RETRY_TIMES', 5),
             force_refresh_if_no_proxies=s.getbool('PROXY_POOL_FORCE_REFRESH', False),
-            try_with_host=s.getbool('PROXY_POOL_TRY_WITH_HOST', True)
+            try_with_host=s.getbool('PROXY_POOL_TRY_WITH_HOST', True),
+            elite=s.getbool('PROXY_POOL_ENABLED_ELITE', False),
+            external_url=s.get('PROXY_POOL_EXTERNAL_URL', None)
         )
         crawler.signals.connect(mw.engine_started,
                                 signal=signals.engine_started)
@@ -174,7 +182,7 @@ class ProxyPoolMiddleware(object):
             request.meta.pop('download_slot', None)
             request.meta.pop('_PROXY_POOL', None)
             return self._retry(request, spider)
-
+        
     def _retry(self, request, spider):
         retries = request.meta.get('proxy_retry_times', 0) + 1
         max_proxies_to_try = request.meta.get('max_proxies_to_try',
